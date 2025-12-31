@@ -6,10 +6,11 @@ import {
     Play, Flame, Lock, BookOpen, Grid3X3,
     Database, Server, Network, Cpu, Brain,
     Bell, Gift, MessageCircle, X, Home, Send,
-    Github, Twitter, Linkedin, Sparkles, Zap, Trophy, Target, ArrowRight, Mic
+    Github, Twitter, Linkedin, Sparkles, Zap, Trophy, Target, ArrowRight, Mic, RotateCcw
 } from 'lucide-react';
 import { getTotalLessons as getSDTotalLessons } from '../data/systemDesignCourse';
 import { getDbmsTotalLessons } from '../data/dbmsCourse';
+import { getTotalLessons as getDSATotalLessons } from '../data/dsaCourse';
 import Footer from '../components/common/Footer';
 
 // Quotes for inspiration
@@ -145,6 +146,7 @@ export default function Dashboard() {
     // Course progress from localStorage
     const [sdProgress, setSDProgress] = useState(0);
     const [dbmsProgress, setDBMSProgress] = useState(0);
+    const [dsaProgress, setDSAProgress] = useState(0);
 
     const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -166,6 +168,15 @@ export default function Dashboard() {
                 const totalLessons = getDbmsTotalLessons();
                 setDBMSProgress(Math.round((completedLessons.length / totalLessons) * 100));
             } catch (e) { console.error('Failed to parse DBMS progress:', e); }
+        }
+
+        const dsaCompleted = localStorage.getItem('dsa-completed-items');
+        if (dsaCompleted) {
+            try {
+                const completedItems = JSON.parse(dsaCompleted);
+                const totalLessons = getDSATotalLessons();
+                setDSAProgress(Math.round((completedItems.length / totalLessons) * 100));
+            } catch (e) { console.error('Failed to parse DSA progress:', e); }
         }
     }, []);
 
@@ -202,8 +213,8 @@ export default function Dashboard() {
             color: 'from-orange-500 to-yellow-500',
             bgGlow: 'bg-orange-500/20',
             startLink: '/dsa-shuru-karein',
-            syllabusLink: '/syllabus/dsa',
-            progress: 0,
+            syllabusLink: '/dsa-syllabus',
+            progress: dsaProgress,
             badge: '🔥 HOT',
             featured: true,
         },
@@ -254,9 +265,7 @@ export default function Dashboard() {
             <header className="relative z-50 bg-gray-800/90 backdrop-blur-md border-b border-gray-600/30 sticky top-0">
                 <div className="container mx-auto px-4 py-3 flex items-center justify-between">
                     <Link to="/" className="flex items-center gap-2 group">
-                        <div className="w-10 h-10 bg-gradient-to-br from-lime-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg shadow-lime-500/20 group-hover:scale-110 transition-all">
-                            <img src="/favicon.png" alt="Adhyaya Logo" className="w-6 h-6 object-contain" />
-                        </div>
+                        <img src="/favicon.png" alt="Adhyaya Logo" className="w-10 h-10 object-contain hover:scale-110 transition-transform" />
                         <div className="hidden md:block">
                             <div className="font-bold text-white">ADHYAYA</div>
                             <div className="text-[10px] text-gray-400 uppercase tracking-widest">Humara Platform</div>
@@ -271,6 +280,10 @@ export default function Dashboard() {
                         <Link to="/mock-interview" className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium text-gray-300 hover:text-lime-400 hover:bg-gray-600/50 transition-all">
                             <Mic className="w-4 h-4" />
                             Mock Interview
+                        </Link>
+                        <Link to="/revision" className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium text-gray-300 hover:text-lime-400 hover:bg-gray-600/50 transition-all">
+                            <RotateCcw className="w-4 h-4" />
+                            Revision
                         </Link>
                         <Link to="/how-to-earn" className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium text-gray-300 hover:text-lime-400 hover:bg-gray-600/50 transition-all">
                             <Gift className="w-4 h-4" />

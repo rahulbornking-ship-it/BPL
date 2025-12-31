@@ -7,7 +7,7 @@ import {
     Edit3, Linkedin, Github, Globe, MapPin,
     GraduationCap, Flame, ClipboardCheck,
     Home, Bell, LogOut, Trophy, Calendar, Sparkles, Mic,
-    Target, Zap, Award, TrendingUp, Star, Code, Crown
+    Target, Zap, Award, TrendingUp, Star, Code, Crown, RotateCcw
 } from 'lucide-react';
 
 // Animated 3D Background
@@ -105,6 +105,7 @@ function AnimatedBackground() {
 const navItems = [
     { name: 'Dashboard', href: '/dashboard', icon: Home },
     { name: 'Mock Interview', href: '/mock-interview', icon: Mic },
+    { name: 'Revision', href: '/revision', icon: RotateCcw },
     { name: 'Rewards', href: '/how-to-earn', icon: Trophy },
 ];
 

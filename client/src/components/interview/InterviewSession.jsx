@@ -473,7 +473,7 @@ export default function InterviewSession({
                 </div>
             )}
 
-            <style jsx>{`
+            <style jsx="true">{`
                 .custom-scrollbar::-webkit-scrollbar {
                     width: 6px;
                 }

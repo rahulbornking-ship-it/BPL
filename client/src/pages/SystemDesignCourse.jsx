@@ -234,9 +234,7 @@ export default function SystemDesignCourse() {
                 <header className="relative bg-transparent border-b border-gray-800/50 backdrop-blur-sm sticky top-0 z-50">
                     <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
                         <Link to="/dashboard" className="flex items-center gap-3 group">
-                            <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center">
-                                <Server className="w-5 h-5 text-white" />
-                            </div>
+                            <img src="/favicon.png" alt="System Design" className="w-10 h-10 object-contain shadow-lg shadow-purple-500/20 transition-transform group-hover:scale-105" />
                             <div>
                                 <span className="text-white font-medium">System Design</span>
                                 <p className="text-gray-500 text-xs">Complete Course</p>

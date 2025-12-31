@@ -1,46 +1,51 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Search, Shuffle, RotateCcw, ChevronDown, ChevronRight,
-    ExternalLink, Check, Sparkles, Target, Trophy, Zap, BookOpen
+    ExternalLink, Check, Sparkles, Target, Trophy, Zap, BookOpen,
+    Grid3X3, ArrowRight, Activity
 } from 'lucide-react';
 import { dsaPatterns, calculateProgress, getAllItems } from '../data/dsaPatterns';
 
 export default function DSAPatterns() {
     const [searchTerm, setSearchTerm] = useState('');
-    const [activeFilter, setActiveFilter] = useState('all');
     const [expandedPatterns, setExpandedPatterns] = useState({});
     const [completedItems, setCompletedItems] = useState(() => {
         const saved = localStorage.getItem('dsa-completed-items');
         return saved ? JSON.parse(saved) : [];
     });
 
+    // 1. Restore Progress Calculation
     const progress = useMemo(() => calculateProgress(completedItems), [completedItems]);
 
+    // 2. Add Difficulty Stats Calculation
+    const difficultyStats = useMemo(() => {
+        const allItems = getAllItems();
+        let easy = 0, medium = 0, hard = 0;
+        allItems.forEach(item => {
+            if (completedItems.includes(item.id)) {
+                if (item.difficulty === 'easy') easy++;
+                else if (item.difficulty === 'medium') medium++;
+                else if (item.difficulty === 'hard') hard++;
+            }
+        });
+        return { easy, medium, hard };
+    }, [completedItems]);
+
+    // 3. Restore Filter Logic
     const filteredPatterns = useMemo(() => {
-        let patterns = [...dsaPatterns];
+        if (!searchTerm) return dsaPatterns;
+        return dsaPatterns.map(pattern => ({
+            ...pattern,
+            items: pattern.items.filter(item =>
+                item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                pattern.name.toLowerCase().includes(searchTerm.toLowerCase())
+            )
+        })).filter(pattern => pattern.items.length > 0);
+    }, [searchTerm]);
 
-        if (searchTerm) {
-            patterns = patterns.map(pattern => ({
-                ...pattern,
-                items: pattern.items.filter(item =>
-                    item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    pattern.name.toLowerCase().includes(searchTerm.toLowerCase())
-                )
-            })).filter(pattern => pattern.items.length > 0);
-        }
-
-        if (activeFilter === 'revision') {
-            patterns = patterns.map(pattern => ({
-                ...pattern,
-                items: pattern.items.filter(item => completedItems.includes(item.id))
-            })).filter(pattern => pattern.items.length > 0);
-        }
-
-        return patterns;
-    }, [searchTerm, activeFilter, completedItems]);
-
+    // 4. Restore Helper Functions
     const togglePattern = (patternId) => {
         setExpandedPatterns(prev => ({
             ...prev,
@@ -72,202 +77,163 @@ export default function DSAPatterns() {
         }
     };
 
-    const getDifficultyStyle = (difficulty) => {
+    const getDifficultyColor = (difficulty) => {
         switch (difficulty) {
-            case 'easy':
-                return 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
-            case 'medium':
-                return 'bg-amber-500/20 text-amber-400 border-amber-500/30';
-            case 'hard':
-                return 'bg-red-500/20 text-red-400 border-red-500/30';
-            case 'theory':
-                return 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30';
-            default:
-                return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
+            case 'easy': return 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20';
+            case 'medium': return 'text-amber-400 bg-amber-500/10 border-amber-500/20';
+            case 'hard': return 'text-red-400 bg-red-500/10 border-red-500/20';
+            default: return 'text-cyan-400 bg-cyan-500/10 border-cyan-500/20';
         }
     };
 
     return (
-        <div className="min-h-screen bg-[#0a0a0a] relative overflow-hidden">
-            {/* Background Glow Effects */}
+        <div className="min-h-screen bg-[#0a0a0a] relative overflow-hidden font-sans">
+            {/* Animated Background - Orange Theme */}
             <div className="fixed inset-0 pointer-events-none">
-                <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-orange-500/10 rounded-full blur-[150px]" />
-                <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[150px]" />
+                <div className="absolute top-20 left-[10%] w-96 h-96 bg-gradient-to-br from-orange-500/10 to-yellow-500/5 rounded-full blur-3xl opacity-60" />
+                <div className="absolute bottom-20 right-[10%] w-[500px] h-[500px] bg-gradient-to-br from-red-500/10 to-orange-500/5 rounded-full blur-3xl opacity-60" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-gradient-to-br from-yellow-500/5 to-amber-500/5 rounded-full blur-3xl opacity-40" />
             </div>
 
-            <main className="relative z-10 container mx-auto px-4 py-8 max-w-7xl">
+            {/* Header */}
+            <header className="relative bg-transparent border-b border-gray-800/50 backdrop-blur-sm sticky top-0 z-50">
+                <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+                    <Link to="/dashboard" className="flex items-center gap-3 group">
+                        <img src="/favicon.png" alt="DSA Logo" className="w-10 h-10 object-contain shadow-lg shadow-orange-500/20 transition-transform group-hover:scale-105" />
+                        <div>
+                            <span className="text-white font-medium block leading-tight">DSA Course</span>
+                            <p className="text-gray-500 text-xs">Data Structures & Algorithms</p>
+                        </div>
+                    </Link>
+                    <div className="flex items-center gap-4">
+                        <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-gray-800/50 border border-gray-700/50 rounded-full">
+                            <Activity className="w-4 h-4 text-orange-400" />
+                            <span className="text-gray-300 text-sm">{progress.solved} Solved</span>
+                        </div>
+                        <Link to="/dashboard" className="text-gray-400 hover:text-white transition-colors text-sm font-medium">
+                            Back to Dashboard
+                        </Link>
+                    </div>
+                </div>
+            </header>
+
+            {/* Main Content */}
+            <main className="relative z-10 max-w-7xl mx-auto px-6 py-12 md:py-16">
+
                 {/* Hero Section */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-center mb-12"
-                >
-                    <h1 className="text-4xl md:text-6xl font-bold mb-4">
-                        <span className="text-white">DSA </span>
-                        <span className="bg-gradient-to-r from-orange-500 to-cyan-400 bg-clip-text text-transparent">
-                            Patterns
+                <div className="text-center mb-20 space-y-6">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500/10 border border-orange-500/20 rounded-full text-orange-400 text-sm font-medium"
+                    >
+                        <Sparkles className="w-4 h-4" />
+                        Master Patterns, Crack Interfaces
+                    </motion.div>
+
+                    <motion.h1
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.1 }}
+                        className="text-5xl md:text-7xl font-bold text-white tracking-tight"
+                    >
+                        Data Structures <br />
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-yellow-400">
+                            & Algorithms
                         </span>
-                        <span className="text-white"> Sheet</span>
-                    </h1>
-                    <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-                        Ek pattern seekho, sau problems solve karo! Master DSA with our curated pattern-based approach.
-                    </p>
-                </motion.div>
+                    </motion.h1>
 
-                {/* Stats Cards */}
+                    <motion.p
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2 }}
+                        className="text-gray-400 text-xl max-w-2xl mx-auto leading-relaxed"
+                    >
+                        A comprehensive, pattern-based approach to mastering DSA.
+                        Don't just solve problems, recognize the underlying patterns.
+                    </motion.p>
+                </div>
+
+                {/* Stats & Progress */}
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                    className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10"
+                    transition={{ delay: 0.3 }}
+                    className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6"
                 >
-                    <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0f0f0f] rounded-2xl p-5 border border-gray-800/50 relative overflow-hidden group hover:border-orange-500/30 transition-all">
-                        <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                        <div className="relative">
-                            <Target className="w-8 h-8 text-orange-500 mb-3" />
-                            <p className="text-3xl font-bold text-white">{progress.solved}</p>
-                            <p className="text-gray-500 text-sm">Solved</p>
-                        </div>
+                    {/* Stat 1 */}
+                    <div className="text-center p-6 rounded-2xl bg-[#12121a] border border-gray-800/50 hover:border-orange-500/30 transition-colors">
+                        <div className="text-4xl font-bold text-white mb-2">{dsaPatterns.length}</div>
+                        <div className="text-gray-500 text-sm uppercase tracking-wider font-medium">Patterns</div>
                     </div>
-                    <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0f0f0f] rounded-2xl p-5 border border-gray-800/50 relative overflow-hidden group hover:border-cyan-500/30 transition-all">
-                        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                        <div className="relative">
-                            <BookOpen className="w-8 h-8 text-cyan-400 mb-3" />
-                            <p className="text-3xl font-bold text-white">{progress.total}</p>
-                            <p className="text-gray-500 text-sm">Total Problems</p>
-                        </div>
+                    {/* Stat 2 */}
+                    <div className="text-center p-6 rounded-2xl bg-[#12121a] border border-gray-800/50 hover:border-orange-500/30 transition-colors">
+                        <div className="text-4xl font-bold text-white mb-2">{progress.total}</div>
+                        <div className="text-gray-500 text-sm uppercase tracking-wider font-medium">Total Problems</div>
                     </div>
-                    <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0f0f0f] rounded-2xl p-5 border border-gray-800/50 relative overflow-hidden group hover:border-emerald-500/30 transition-all">
-                        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                        <div className="relative">
-                            <Trophy className="w-8 h-8 text-emerald-400 mb-3" />
-                            <p className="text-3xl font-bold text-white">{progress.percentage}%</p>
-                            <p className="text-gray-500 text-sm">Completed</p>
-                        </div>
+                    {/* Stat 3 */}
+                    <div className="text-center p-6 rounded-2xl bg-[#12121a] border border-gray-800/50 hover:border-orange-500/30 transition-colors">
+                        <div className="text-4xl font-bold text-orange-400 mb-2">{progress.percentage}%</div>
+                        <div className="text-gray-500 text-sm uppercase tracking-wider font-medium">Completed</div>
                     </div>
-                    <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0f0f0f] rounded-2xl p-5 border border-gray-800/50 relative overflow-hidden group hover:border-purple-500/30 transition-all">
-                        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                        <div className="relative">
-                            <Zap className="w-8 h-8 text-purple-400 mb-3" />
-                            <p className="text-3xl font-bold text-white">{dsaPatterns.length}</p>
-                            <p className="text-gray-500 text-sm">Patterns</p>
-                        </div>
+                    {/* Stat 4 */}
+                    <div className="text-center p-6 rounded-2xl bg-[#12121a] border border-gray-800/50 hover:border-orange-500/30 transition-colors">
+                        <div className="text-4xl font-bold text-white mb-2">{progress.solved}</div>
+                        <div className="text-gray-500 text-sm uppercase tracking-wider font-medium">Solved</div>
                     </div>
                 </motion.div>
 
-                {/* Difficulty Progress Bars */}
+                {/* Difficulty Breakdown */}
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.15 }}
-                    className="bg-gradient-to-br from-[#1a1a1a] to-[#0f0f0f] rounded-2xl p-6 border border-gray-800/50 mb-10"
+                    transition={{ delay: 0.4 }}
+                    className="grid grid-cols-3 gap-6 mb-24 max-w-4xl mx-auto"
                 >
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {/* Easy */}
-                        <div>
-                            <div className="flex justify-between text-sm mb-2">
-                                <span className="text-emerald-400 font-medium">Easy</span>
-                                <span className="text-gray-400">{progress.easy.solved} / {progress.easy.total}</span>
-                            </div>
-                            <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
-                                <motion.div
-                                    className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full"
-                                    initial={{ width: 0 }}
-                                    animate={{ width: progress.easy.total > 0 ? `${(progress.easy.solved / progress.easy.total) * 100}%` : '0%' }}
-                                    transition={{ duration: 1, ease: "easeOut" }}
-                                />
-                            </div>
-                        </div>
-                        {/* Medium */}
-                        <div>
-                            <div className="flex justify-between text-sm mb-2">
-                                <span className="text-amber-400 font-medium">Medium</span>
-                                <span className="text-gray-400">{progress.medium.solved} / {progress.medium.total}</span>
-                            </div>
-                            <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
-                                <motion.div
-                                    className="h-full bg-gradient-to-r from-amber-500 to-amber-400 rounded-full"
-                                    initial={{ width: 0 }}
-                                    animate={{ width: progress.medium.total > 0 ? `${(progress.medium.solved / progress.medium.total) * 100}%` : '0%' }}
-                                    transition={{ duration: 1, ease: "easeOut", delay: 0.1 }}
-                                />
-                            </div>
-                        </div>
-                        {/* Hard */}
-                        <div>
-                            <div className="flex justify-between text-sm mb-2">
-                                <span className="text-red-400 font-medium">Hard</span>
-                                <span className="text-gray-400">{progress.hard.solved} / {progress.hard.total}</span>
-                            </div>
-                            <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
-                                <motion.div
-                                    className="h-full bg-gradient-to-r from-red-500 to-red-400 rounded-full"
-                                    initial={{ width: 0 }}
-                                    animate={{ width: progress.hard.total > 0 ? `${(progress.hard.solved / progress.hard.total) * 100}%` : '0%' }}
-                                    transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
-                                />
-                            </div>
-                        </div>
+                    <div className="text-center p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
+                        <div className="text-2xl font-bold text-emerald-400 mb-1">{difficultyStats.easy}</div>
+                        <div className="text-emerald-500/60 text-xs uppercase tracking-wider font-bold">Easy</div>
+                    </div>
+                    <div className="text-center p-4 rounded-xl bg-amber-500/5 border border-amber-500/10">
+                        <div className="text-2xl font-bold text-amber-400 mb-1">{difficultyStats.medium}</div>
+                        <div className="text-amber-500/60 text-xs uppercase tracking-wider font-bold">Medium</div>
+                    </div>
+                    <div className="text-center p-4 rounded-xl bg-red-500/5 border border-red-500/10">
+                        <div className="text-2xl font-bold text-red-400 mb-1">{difficultyStats.hard}</div>
+                        <div className="text-red-500/60 text-xs uppercase tracking-wider font-bold">Hard</div>
                     </div>
                 </motion.div>
 
-                {/* Search and Filters */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="flex flex-col md:flex-row gap-4 mb-8"
-                >
-                    {/* Search Input */}
-                    <div className="relative flex-1">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
-                        <input
-                            type="text"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            placeholder="Search patterns or problems..."
-                            className="w-full bg-[#1a1a1a] border border-gray-800 rounded-xl pl-12 pr-4 py-3.5 text-white placeholder-gray-500 focus:outline-none focus:border-orange-500/50 focus:ring-2 focus:ring-orange-500/20 transition-all"
-                        />
+                {/* Search Bar */}
+                <div className="max-w-2xl mx-auto mb-16 relative">
+                    <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                        <Search className="w-5 h-5 text-gray-500" />
                     </div>
+                    <input
+                        type="text"
+                        placeholder="Search for patterns (e.g., 'Sliding Window') or problems..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full bg-[#15151e] border border-gray-800 text-white text-lg rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/50 transition-all placeholder-gray-600 shadow-xl"
+                    />
+                    {searchTerm && (
+                        <button
+                            onClick={() => setSearchTerm('')}
+                            className="absolute inset-y-0 right-4 flex items-center text-gray-500 hover:text-white"
+                        >
+                            Clear
+                        </button>
+                    )}
+                </div>
 
-                    {/* Filter Buttons */}
-                    <div className="flex gap-2">
-                        <button
-                            onClick={() => setActiveFilter('all')}
-                            className={`px-5 py-3 rounded-xl text-sm font-medium transition-all flex items-center gap-2 ${activeFilter === 'all'
-                                    ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-500/25'
-                                    : 'bg-[#1a1a1a] text-gray-400 hover:bg-[#252525] border border-gray-800'
-                                }`}
-                        >
-                            <Sparkles className="w-4 h-4" />
-                            All Patterns
-                        </button>
-                        <button
-                            onClick={() => setActiveFilter('revision')}
-                            className={`px-5 py-3 rounded-xl text-sm font-medium transition-all flex items-center gap-2 ${activeFilter === 'revision'
-                                    ? 'bg-gradient-to-r from-cyan-500 to-cyan-600 text-white shadow-lg shadow-cyan-500/25'
-                                    : 'bg-[#1a1a1a] text-gray-400 hover:bg-[#252525] border border-gray-800'
-                                }`}
-                        >
-                            <RotateCcw className="w-4 h-4" />
-                            Revision
-                        </button>
-                        <button
-                            onClick={handleRandomPattern}
-                            className="px-5 py-3 rounded-xl text-sm font-medium transition-all flex items-center gap-2 bg-[#1a1a1a] text-gray-400 hover:bg-[#252525] border border-gray-800 hover:text-orange-400 hover:border-orange-500/30"
-                        >
-                            <Shuffle className="w-4 h-4" />
-                            Random
-                        </button>
-                    </div>
-                </motion.div>
-
-                {/* Pattern Cards */}
-                <div className="space-y-4">
+                {/* Patterns Grid */}
+                <div className="space-y-8">
                     {filteredPatterns.map((pattern, idx) => {
                         const isExpanded = expandedPatterns[pattern.id];
                         const patternCompleted = pattern.items.filter(item => completedItems.includes(item.id)).length;
-                        const progressPercent = pattern.items.length > 0 ? (patternCompleted / pattern.items.length) * 100 : 0;
+                        const patternTotal = pattern.items.length;
+                        const completionPercent = patternTotal > 0 ? (patternCompleted / patternTotal) * 100 : 0;
+                        const isFullyComplete = patternCompleted === patternTotal && patternTotal > 0;
 
                         return (
                             <motion.div
@@ -275,146 +241,136 @@ export default function DSAPatterns() {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.05 * idx }}
-                                className="group"
+                                className={`rounded-3xl border transition-all duration-300 overflow-hidden bg-[#12121a] ${isExpanded ? 'border-orange-500/30 shadow-2xl shadow-orange-500/10' : 'border-gray-800 hover:border-gray-700'
+                                    }`}
                             >
-                                <div className={`bg-gradient-to-br from-[#1a1a1a] to-[#0f0f0f] rounded-2xl border transition-all duration-300 overflow-hidden ${isExpanded
-                                        ? 'border-orange-500/30 shadow-lg shadow-orange-500/10'
-                                        : 'border-gray-800/50 hover:border-gray-700'
-                                    }`}>
-                                    {/* Accordion Header */}
-                                    <button
-                                        onClick={() => togglePattern(pattern.id)}
-                                        className="w-full flex items-center justify-between p-5 hover:bg-white/[0.02] transition-colors"
-                                    >
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500/20 to-cyan-500/20 flex items-center justify-center text-2xl border border-orange-500/20">
-                                                {pattern.icon}
-                                            </div>
-                                            <div className="text-left">
-                                                <h3 className="text-white font-semibold text-lg group-hover:text-orange-400 transition-colors">
-                                                    {pattern.name}
-                                                </h3>
-                                                <p className="text-gray-500 text-sm">{pattern.items.length} problems</p>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-6">
-                                            {/* Progress Bar */}
-                                            <div className="hidden md:flex items-center gap-3 w-48">
-                                                <div className="flex-1 h-2 bg-gray-800 rounded-full overflow-hidden">
-                                                    <motion.div
-                                                        className="h-full bg-gradient-to-r from-orange-500 to-cyan-400 rounded-full"
-                                                        initial={{ width: 0 }}
-                                                        animate={{ width: `${progressPercent}%` }}
-                                                        transition={{ duration: 0.5 }}
-                                                    />
-                                                </div>
-                                                <span className="text-sm font-medium text-gray-400 min-w-[45px]">
-                                                    {patternCompleted}/{pattern.items.length}
-                                                </span>
-                                            </div>
-                                            <motion.div
-                                                animate={{ rotate: isExpanded ? 180 : 0 }}
-                                                transition={{ duration: 0.2 }}
-                                                className="w-8 h-8 rounded-lg bg-gray-800/50 flex items-center justify-center"
-                                            >
-                                                <ChevronDown className="w-5 h-5 text-gray-400" />
-                                            </motion.div>
-                                        </div>
-                                    </button>
+                                <button
+                                    onClick={() => togglePattern(pattern.id)}
+                                    className="w-full p-6 md:p-8 flex flex-col md:flex-row md:items-center gap-6 text-left relative overflow-hidden group"
+                                >
+                                    {/* Hover Gradient */}
+                                    <div className="absolute inset-0 bg-gradient-to-r from-orange-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-                                    {/* Problem List */}
-                                    <AnimatePresence>
-                                        {isExpanded && (
-                                            <motion.div
-                                                initial={{ height: 0, opacity: 0 }}
-                                                animate={{ height: 'auto', opacity: 1 }}
-                                                exit={{ height: 0, opacity: 0 }}
-                                                transition={{ duration: 0.3 }}
-                                                className="overflow-hidden"
-                                            >
-                                                <div className="border-t border-gray-800/50 px-5 py-4">
-                                                    <div className="space-y-1">
-                                                        {pattern.items.map((item, itemIdx) => {
-                                                            const isCompleted = completedItems.includes(item.id);
-                                                            return (
-                                                                <motion.div
-                                                                    key={item.id}
-                                                                    initial={{ opacity: 0, x: -10 }}
-                                                                    animate={{ opacity: 1, x: 0 }}
-                                                                    transition={{ delay: 0.03 * itemIdx }}
-                                                                    className="flex items-center justify-between py-3 px-4 rounded-xl hover:bg-white/[0.03] transition-all group/item"
+                                    {/* Icon Box */}
+                                    <div className={`relative w-16 h-16 rounded-2xl flex-shrink-0 flex items-center justify-center text-3xl shadow-lg transition-transform group-hover:scale-105 ${isFullyComplete ? 'bg-gradient-to-br from-green-500/20 to-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                                        : 'bg-gradient-to-br from-gray-800 to-gray-900 text-gray-400 border border-gray-700 group-hover:border-orange-500/30 group-hover:text-orange-400'
+                                        }`}>
+                                        {isFullyComplete ? <Check className="w-8 h-8" /> : pattern.icon}
+                                    </div>
+
+                                    {/* Content */}
+                                    <div className="flex-1 min-w-0 relative z-10">
+                                        <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-orange-400 transition-colors">
+                                            {pattern.name}
+                                        </h3>
+                                        <div className="flex items-center gap-4 text-sm text-gray-500">
+                                            <span>{patternTotal} Problems</span>
+                                            {pattern.description && (
+                                                <>
+                                                    <span className="w-1 h-1 rounded-full bg-gray-600" />
+                                                    <span className="truncate max-w-md">{pattern.description}</span>
+                                                </>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* Right Actions */}
+                                    <div className="flex items-center gap-6 relative z-10 w-full md:w-auto mt-4 md:mt-0 justify-between md:justify-end">
+
+                                        {/* Progress Bar & Count */}
+                                        <div className="flex flex-col items-end gap-1.5 w-32">
+                                            <div className="text-sm font-medium text-gray-300">
+                                                {Math.round(completionPercent)}%
+                                            </div>
+                                            <div className="w-full h-1.5 bg-gray-800 rounded-full overflow-hidden">
+                                                <div
+                                                    className={`h-full rounded-full transition-all duration-500 ${isFullyComplete ? 'bg-emerald-500' : 'bg-gradient-to-r from-orange-500 to-yellow-500'}`}
+                                                    style={{ width: `${completionPercent}%` }}
+                                                />
+                                            </div>
+                                            <div className="text-xs text-gray-500">{patternCompleted} / {patternTotal}</div>
+                                        </div>
+
+                                        <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${isExpanded ? 'bg-orange-500/20 text-orange-400 rotate-180' : 'bg-gray-800 text-gray-400 group-hover:bg-gray-700'}`}>
+                                            <ChevronDown className="w-5 h-5" />
+                                        </div>
+                                    </div>
+                                </button>
+
+                                {/* Expanded Content */}
+                                <AnimatePresence>
+                                    {isExpanded && (
+                                        <motion.div
+                                            initial={{ height: 0, opacity: 0 }}
+                                            animate={{ height: 'auto', opacity: 1 }}
+                                            exit={{ height: 0, opacity: 0 }}
+                                            transition={{ duration: 0.3, ease: 'easeInOut' }}
+                                        >
+                                            <div className="border-t border-gray-800/50 bg-[#0c0c12]">
+                                                {pattern.items.map((item, itemIdx) => {
+                                                    const isCompleted = completedItems.includes(item.id);
+                                                    return (
+                                                        <Link
+                                                            key={item.id}
+                                                            to={`/dsa/${pattern.slug}/${item.slug}`}
+                                                            className="flex items-center justify-between p-6 hover:bg-white/[0.02] transition-colors border-b border-gray-800/30 last:border-0 group/item"
+                                                        >
+                                                            <div className="flex items-center gap-4">
+                                                                <button
+                                                                    onClick={(e) => toggleItemCompletion(item.id, e)}
+                                                                    className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${isCompleted
+                                                                        ? 'bg-emerald-500 border-emerald-500'
+                                                                        : 'border-gray-600 hover:border-orange-500'
+                                                                        }`}
                                                                 >
-                                                                    <div className="flex items-center gap-3">
-                                                                        <button
-                                                                            onClick={(e) => toggleItemCompletion(item.id, e)}
-                                                                            className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${isCompleted
-                                                                                    ? 'bg-gradient-to-r from-orange-500 to-cyan-500 border-transparent'
-                                                                                    : 'border-gray-600 hover:border-orange-500'
-                                                                                }`}
-                                                                        >
-                                                                            {isCompleted && <Check className="w-3 h-3 text-white" />}
-                                                                        </button>
-                                                                        <Link
-                                                                            to={`/dsa/${pattern.slug}/${item.slug}`}
-                                                                            className={`text-sm font-medium transition-colors ${isCompleted
-                                                                                    ? 'text-gray-500 line-through'
-                                                                                    : 'text-white group-hover/item:text-orange-400'
-                                                                                }`}
-                                                                        >
-                                                                            {item.title}
-                                                                        </Link>
-                                                                        <span className={`text-xs px-2.5 py-0.5 rounded-full border ${getDifficultyStyle(item.difficulty)}`}>
-                                                                            {item.difficulty === 'theory' ? '📚 Theory' : item.difficulty}
-                                                                        </span>
+                                                                    {isCompleted && <Check className="w-4 h-4 text-white" />}
+                                                                </button>
+                                                                <div>
+                                                                    <div className={`font-medium text-lg mb-1 transition-colors ${isCompleted ? 'text-gray-500 line-through' : 'text-gray-200 group-hover/item:text-orange-400'
+                                                                        }`}>
+                                                                        {item.title}
                                                                     </div>
-                                                                    <div className="flex items-center gap-2 opacity-0 group-hover/item:opacity-100 transition-opacity">
-                                                                        <Link
-                                                                            to={`/dsa/${pattern.slug}/${item.slug}`}
-                                                                            className="p-2 rounded-lg hover:bg-gray-800 text-gray-400 hover:text-orange-400 transition-colors"
-                                                                        >
-                                                                            <ChevronRight className="w-4 h-4" />
-                                                                        </Link>
-                                                                        {item.externalLink && (
-                                                                            <a
-                                                                                href={item.externalLink}
-                                                                                target="_blank"
-                                                                                rel="noopener noreferrer"
-                                                                                className="p-2 rounded-lg hover:bg-gray-800 text-gray-400 hover:text-cyan-400 transition-colors"
-                                                                                onClick={(e) => e.stopPropagation()}
-                                                                            >
-                                                                                <ExternalLink className="w-4 h-4" />
-                                                                            </a>
-                                                                        )}
-                                                                    </div>
-                                                                </motion.div>
-                                                            );
-                                                        })}
-                                                    </div>
-                                                </div>
-                                            </motion.div>
-                                        )}
-                                    </AnimatePresence>
-                                </div>
+                                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium border ${getDifficultyColor(item.difficulty)}`}>
+                                                                        {item.difficulty === 'theory' ? 'Theory' : item.difficulty}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="flex items-center gap-4 opacity-0 group-hover/item:opacity-100 transition-opacity">
+                                                                {item.externalLink && (
+                                                                    <a
+                                                                        href={item.externalLink}
+                                                                        target="_blank"
+                                                                        rel="noopener noreferrer"
+                                                                        onClick={(e) => e.stopPropagation()}
+                                                                        className="p-2 text-gray-500 hover:text-white transition-colors"
+                                                                        title="Solve on LeetCode"
+                                                                    >
+                                                                        <ExternalLink className="w-5 h-5" />
+                                                                    </a>
+                                                                )}
+                                                                <div className="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center text-gray-400">
+                                                                    <ChevronRight className="w-4 h-4" />
+                                                                </div>
+                                                            </div>
+                                                        </Link>
+                                                    );
+                                                })}
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
                             </motion.div>
                         );
                     })}
                 </div>
 
                 {filteredPatterns.length === 0 && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="text-center py-16"
-                    >
-                        <div className="text-6xl mb-4">🔍</div>
-                        <p className="text-gray-400 text-lg">No patterns found matching your search.</p>
-                        <button
-                            onClick={() => setSearchTerm('')}
-                            className="mt-4 text-orange-400 hover:text-orange-300 transition-colors"
-                        >
-                            Clear search
-                        </button>
-                    </motion.div>
+                    <div className="text-center py-32 opacity-50">
+                        <Search className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+                        <h3 className="text-2xl font-bold text-gray-400">No patterns found</h3>
+                        <p className="text-gray-600 mt-2">Try searching for a different keyword.</p>
+                    </div>
                 )}
             </main>
         </div>

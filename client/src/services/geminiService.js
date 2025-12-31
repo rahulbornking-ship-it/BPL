@@ -3,22 +3,16 @@
 
 const GEMINI_API_KEYS = [
     'AIzaSyDVY4zBTunPZt_92g0QJOk7zIO0cHt98jI',
-    'AIzaSyAKpbPHV_mTHhm6qOGIeUbh63NeNpj6hcQ',
-    'AIzaSyDvCSG7wqyKuufEUqJqBrb_2bebwwtic8s',
-    'AIzaSyAu2dyrvY5uz-7w6a-4eZPQ9ZN_S9Qug60',
-    'AIzaSyDw-2lvbbbxghnIM_HIbHji31f8ztE',
-    'AIzaSyBa3JMR0keVPKdOt2qlNWkiDU2fCYkarzQ',
-    'AIzaSyAlbf9bCDaeJQE-r_Kw4P-TZ4ZduKMig2I',
-    'AIzaSyC83Dt_udhUzV-6zSOdpl5w9HsPAQrj6q0',
-    'AIzaSyD0t8K7O5qG92AM-LdDL3Hi5HJi31f8ztE',
-    'AIzaSyB-XwB1TntMXYYEBF_O_vs9cASOUoPoL8Q',
-    'AIzaSyBsbK_K7PXqXfQiW7wbxGz2SYsS4V3ywTs',
-    'AIzaSyA0f08esf39l7TkHIQNfwVCSCuG_4Asi0A',
-    'AIzaSyBhwvjRJd79IOaMfRaQfElQ0Ncy2NdSH8U',
-    'AIzaSyBeqgG0eq5AVyRFxewzpCSyaQPHlA7uuGk'
+    'AIzaSyCJKnsbf93mLOFTUCD3xYJWFRVOOTxLPms',
+    'AIzaSyDC-CtF-aFhWQCkb3WMiLTZrbkuY-ODCAs',
+    'AIzaSyB7VzJfh7LeLLVfSABIo07OnILroGqwq2c',
+    'AIzaSyC2iS2lBmEBxJFTjp7fG8TRBZKGINCmYWI',
+    'AIzaSyASbFAKZQnxkPyV9ly1R4agz69ruaujFmM',
+    'AIzaSyBs7BP76pvSQS5f3yu5DPBV8FfmK0hiaZ8',
+    'AIzaSyALo3O4oeUlfUvRr56KYXVVRAbefSl62OI'
 ];
 
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
 
 class GeminiService {
     constructor() {
@@ -247,6 +241,63 @@ Be fair but thorough in your evaluation.`;
                 improvements: ['Try to be more specific'],
                 followUp: null
             };
+        }
+    }
+
+    // Generate topic-specific revision questions
+    async generateRevisionQuestions(course, topic, contextData, duration) {
+        let questionCount = duration === 20 ? 10 : 15;
+        // Limit context size if needed, but lesson titles/desc are usually small
+        const contextString = JSON.stringify(contextData).slice(0, 5000);
+
+        const prompt = `You are a strict and precise question generator for a Revision Session.
+        
+        Session Details:
+        - Course: ${course}
+        - Topic: ${topic.title}
+        - Description: ${topic.description}
+        - Duration: ${duration} minutes
+        - Question Count: ${questionCount} questions
+
+        CONTEXT DATA (STRICTLY USE THIS ONLY):
+        ${contextString}
+
+        INSTRUCTIONS:
+        1. Generate exactly ${questionCount} questions.
+        2. Questions MUST be based ONLY on the provided Context Data. Do NOT hallucinate or bring in outside knowledge not present in the context.
+        3. Mix the following types:
+           - MCQ (Multiple Choice with 4 options) - approx 40%
+           - ShortAnswer (One line text answer) - approx 30%
+           - Conceptual (Explain in simple words) - approx 30%
+        4. Difficulty: Beginner to Intermediate (Interview prep level).
+        5. Return ONLY a valid JSON array of objects.
+        
+        JSON FORMAT:
+        [
+            {
+                "id": 1,
+                "type": "MCQ" | "ShortAnswer" | "Conceptual",
+                "question": "Question text here...",
+                "options": ["A", "B", "C", "D"], // Only for MCQ. MUST include the correct answer.
+                "correctAnswer": "Correct option text or answer key", 
+                "explanation": "Brief explanation of the answer sourced from context."
+            }
+        ]
+        
+        If the context data is insufficient to generate ${questionCount} questions, generate as many as possible without hallucinating.`;
+
+        try {
+            const response = await this.makeRequest(prompt);
+            // Try to parse JSON from response
+            const jsonMatch = response.match(/\[[\s\S]*\]/);
+            if (jsonMatch) {
+                return JSON.parse(jsonMatch[0]);
+            }
+            throw new Error("Failed to parse questions JSON");
+        } catch (error) {
+            console.error("Error generating revision questions:", error);
+            // Fallback or rethrow
+            throw error;
         }
     }
 

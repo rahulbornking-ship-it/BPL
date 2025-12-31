@@ -32,6 +32,8 @@ import DBMSSyllabus from './pages/DBMSSyllabus';
 import ChaiTapri from './pages/ChaiTapri';
 import About from './pages/About';
 import MockInterview from './pages/MockInterview';
+import DSASyllabus from './pages/DSASyllabus';
+import RevisionPage from './pages/RevisionPage';
 
 function App() {
     const { loading } = useAuth();
@@ -74,7 +76,11 @@ function App() {
                 <Route path="/chai-tapri" element={<ChaiTapri />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/mock-interview" element={<MockInterview />} />
+                <Route path="/revision" element={<RevisionPage />} />
+                <Route path="/dsa" element={<DSAPatterns />} />
+                <Route path="/dsa-shuru-karein" element={<DSAPatterns />} />
                 <Route path="/dsa/:patternSlug/:itemSlug" element={<DSAItemDetail />} />
+                <Route path="/dsa-syllabus" element={<DSASyllabus />} />
             </Routes>
         </MainLayout>
     );

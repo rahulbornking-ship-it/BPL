@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import {
     Home, Bell, Gift, BookOpen, Crown, Rocket, Mic,
-    Linkedin, Github, Globe, Flame, GraduationCap, ArrowRight, Sparkles, Star, Coins, Trophy, ChevronRight
+    Linkedin, Github, Globe, Flame, GraduationCap, ArrowRight, Sparkles, Star, Coins, Trophy, ChevronRight, RotateCcw
 } from 'lucide-react';
 
 // Floating Coins Background
@@ -118,6 +118,7 @@ function CoinsBackground() {
 const navItems = [
     { name: 'Dashboard', href: '/dashboard', icon: Home },
     { name: 'Mock Interview', href: '/mock-interview', icon: Mic },
+    { name: 'Revision', href: '/revision', icon: RotateCcw },
     { name: 'Rewards', href: '/how-to-earn', icon: Gift, active: true },
 ];
 

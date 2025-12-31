@@ -1,0 +1,627 @@
+[
+  {
+    "pattern": "Two Pointers",
+    "question": "Valid Palindrome",
+    "videoId": "Yi90cuHYyWQ",
+    "startTime": 198,
+    "endTime": 1074,
+    "lectureNotes": "https://github.com/team-codebug/babua-dsa-patterns-course/blob/36f9a9db57f8be257036b025d66502840a732eb5/2_Day/End_Day_2.pdf",
+    "intuition": "Socho aise - string ke start aur end se ek ek pointer lo. Dono ko middle ki taraf move karo. Har step pe check karo ki dono characters same hain ya nahi (spaces aur special chars ko skip karo). Agar kabhi bhi mismatch mile, return false. Agar dono pointers cross kar jaayein bina kisi mismatch ke, matlab palindrome hai!",
+    "javaCode": "class Solution {\n    public boolean isPalindrome(String s) {\n        int i = 0, j = s.length() - 1;\n\n        while (i < j) {\n            char left = s.charAt(i);\n            char right = s.charAt(j);\n\n            if (!Character.isLetterOrDigit(left)) {\n                i++;\n                continue;\n            }\n\n            if (!Character.isLetterOrDigit(right)) {\n                j--;\n                continue;\n            }\n\n            if (Character.toLowerCase(left) != Character.toLowerCase(right)) {\n                return false;\n            }\n\n            i++;\n            j--;\n        }\n\n        return true;\n    }\n}",
+    "cppCode": "class Solution {\npublic:\n    bool isPalindrome(string s) {\n        int i = 0, j = s.length() - 1;\n\n        while (i < j) {\n            char left = s[i];\n            char right = s[j];\n\n            if (!isalnum(left)) {\n                i++;\n                continue;\n            }\n\n            if (!isalnum(right)) {\n                j--;\n                continue;\n            }\n\n            if (tolower(left) != tolower(right)) {\n                return false;\n            }\n\n            i++;\n            j--;\n        }\n\n        return true;\n    }\n};"
+  },
+  {
+    "pattern": "Two Pointers",
+    "question": "Reverse String",
+    "videoId": "Yi90cuHYyWQ",
+    "startTime": 1074,
+    "endTime": 1464,
+    "lectureNotes": "https://github.com/team-codebug/babua-dsa-patterns-course/blob/36f9a9db57f8be257036b025d66502840a732eb5/2_Day/End_Day_2.pdf",
+    "intuition": "Simple hai bhai! Ek pointer start pe rakho (i=0), doosra end pe (j=n-1). Dono ke characters swap karo, phir i ko aage badhaao, j ko peeche. Jab tak i < j, swap karte raho. In-place ho jaayega reverse!",
+    "javaCode": "class Solution {\n    public void reverseString(char[] s) {\n        int i = 0, j = s.length - 1;\n\n        while (i < j) {\n            char temp = s[i];\n            s[i] = s[j];\n            s[j] = temp;\n            i++;\n            j--;\n        }\n    }\n}",
+    "cppCode": "class Solution {\npublic:\n    void reverseString(vector<char>& s) {\n        int i = 0, j = s.size() - 1;\n\n        while (i < j) {\n            swap(s[i], s[j]);\n            i++;\n            j--;\n        }\n    }\n};"
+  },
+  {
+    "pattern": "Two Pointers",
+    "question": "Squares of a Sorted Array",
+    "videoId": "Yi90cuHYyWQ",
+    "startTime": 1476,
+    "endTime": 2073,
+    "lectureNotes": "https://github.com/team-codebug/babua-dsa-patterns-course/blob/36f9a9db57f8be257036b025d66502840a732eb5/2_Day/End_Day_2.pdf",
+    "intuition": "Dekho, array sorted hai but negative numbers bhi hain. Negative ka square positive ho jaata hai, toh directly sort nahi kar sakte.\n\nTrick: Do pointers lo - ek start pe, ek end pe. Compare karo absolute values. Jo bada hai uska square result array ke END mein daalo (kyunki sorted order chahiye). Pointer move karo accordingly.\n\nKyun kaam karta hai? Kyunki sorted array mein sabse bade squares ya toh start pe honge (negative numbers) ya end pe (positive numbers).",
+    "javaCode": "class Solution {\n    public int[] sortedSquares(int[] nums) {\n        int n = nums.length;\n        int[] result = new int[n];\n        int i = 0, j = n - 1;\n        int k = n - 1; // Fill from end\n\n        while (i <= j) {\n            int leftSq = nums[i] * nums[i];\n            int rightSq = nums[j] * nums[j];\n\n            if (leftSq > rightSq) {\n                result[k] = leftSq;\n                i++;\n            } else {\n                result[k] = rightSq;\n                j--;\n            }\n            k--;\n        }\n\n        return result;\n    }\n}",
+    "cppCode": "class Solution {\npublic:\n    vector<int> sortedSquares(vector<int>& nums) {\n        int n = nums.size();\n        vector<int> result(n);\n        int i = 0, j = n - 1;\n        int k = n - 1;\n\n        while (i <= j) {\n            int leftSq = nums[i] * nums[i];\n            int rightSq = nums[j] * nums[j];\n\n            if (leftSq > rightSq) {\n                result[k--] = leftSq;\n                i++;\n            } else {\n                result[k--] = rightSq;\n                j--;\n            }\n        }\n\n        return result;\n    }\n};"
+  },
+  {
+    "pattern": "Two Pointers",
+    "question": "Valid Palindrome II",
+    "videoId": "Yi90cuHYyWQ",
+    "startTime": 2073,
+    "endTime": 2821,
+    "lectureNotes": "https://github.com/team-codebug/babua-dsa-patterns-course/blob/36f9a9db57f8be257036b025d66502840a732eb5/2_Day/End_Day_2.pdf",
+    "intuition": "Normal palindrome check ki tarah do pointers se shuru karo. Jab mismatch mile, tab 2 options hain - ya toh left character hataao, ya right.\n\nDono cases check karo (recursively ya helper function se). Agar kisi bhi case mein remaining substring palindrome hai, return true.\n\nEk hi deletion ki permission hai, toh zyada complicated nahi hai!",
+    "javaCode": "class Solution {\n    public boolean validPalindrome(String s) {\n        int i = 0, j = s.length() - 1;\n\n        while (i < j) {\n            if (s.charAt(i) != s.charAt(j)) {\n                // Try skipping either left or right char\n                return isPalindrome(s, i + 1, j) || isPalindrome(s, i, j - 1);\n            }\n            i++;\n            j--;\n        }\n\n        return true;\n    }\n\n    private boolean isPalindrome(String s, int i, int j) {\n        while (i < j) {\n            if (s.charAt(i) != s.charAt(j)) {\n                return false;\n            }\n            i++;\n            j--;\n        }\n        return true;\n    }\n}",
+    "cppCode": "class Solution {\npublic:\n    bool validPalindrome(string s) {\n        int i = 0, j = s.length() - 1;\n\n        while (i < j) {\n            if (s[i] != s[j]) {\n                return isPalindrome(s, i + 1, j) || isPalindrome(s, i, j - 1);\n            }\n            i++;\n            j--;\n        }\n\n        return true;\n    }\n\nprivate:\n    bool isPalindrome(string& s, int i, int j) {\n        while (i < j) {\n            if (s[i] != s[j]) return false;\n            i++;\n            j--;\n        }\n        return true;\n    }\n};"
+  },
+  {
+    "pattern": "Two Pointers",
+    "question": "Valid Word Abbreviation",
+    "videoId": "Yi90cuHYyWQ",
+    "startTime": 2821,
+    "endTime": 4030,
+    "lectureNotes": "https://github.com/team-codebug/babua-dsa-patterns-course/blob/36f9a9db57f8be257036b025d66502840a732eb5/2_Day/End_Day_2.pdf",
+    "intuition": "Word aur abbreviation ke liye do pointers chalao. Abbreviation me digits aayengi to unhe ek number banao jo batata hai ki original word me kitne characters skip karne hain. Leading zero allow nahi hai. Har letter match karo; mismatch ya boundary cross hui to false. Dono pointers end tak safely pahunch gaye to true.",
+    "javaCode": "class Solution {\n    public boolean validWordAbbreviation(String word, String abbr) {\n        int i = 0, j = 0;\n        int n = word.length(), m = abbr.length();\n\n        while (i < n && j < m) {\n            char c = abbr.charAt(j);\n\n            if (Character.isDigit(c)) {\n                if (c == '0') return false; // leading zero not allowed\n                int skip = 0;\n                while (j < m && Character.isDigit(abbr.charAt(j))) {\n                    skip = skip * 10 + (abbr.charAt(j) - '0');\n                    j++;\n                }\n                i += skip;\n                continue;\n            }\n\n            if (i >= n || word.charAt(i) != c) return false;\n            i++;\n            j++;\n        }\n\n        return i == n && j == m;\n    }\n}",
+    "cppCode": "class Solution {\npublic:\n    bool validWordAbbreviation(string word, string abbr) {\n        int i = 0, j = 0;\n        int n = word.size(), m = abbr.size();\n\n        while (i < n && j < m) {\n            char c = abbr[j];\n\n            if (isdigit(c)) {\n                if (c == '0') return false;\n                int skip = 0;\n                while (j < m && isdigit(abbr[j])) {\n                    skip = skip * 10 + (abbr[j] - '0');\n                    j++;\n                }\n                i += skip;\n                continue;\n            }\n\n            if (i >= n || word[i] != c) return false;\n            i++;\n            j++;\n        }\n\n        return i == n && j == m;\n    }\n};"
+  },
+  {
+    "pattern": "Two Pointers",
+    "question": "Merge Sorted Array",
+    "videoId": "SP065oLnxGA",
+    "startTime": 160,
+    "endTime": 1138,
+    "intuition": "Dono arrays ke end se merge karo. Kyun? Kyunki nums1 me extra space last me hai; peeche se fill karoge to overwrite issue nahi hoga. i = m-1, j = n-1, k = m+n-1. Jo bada element hai usse nums1[k] me daalte jao, pointers move karo.",
+    "javaCode": "class Solution {\n    public void merge(int[] nums1, int m, int[] nums2, int n) {\n        int i = m - 1, j = n - 1, k = m + n - 1;\n\n        while (j >= 0) {\n            if (i >= 0 && nums1[i] > nums2[j]) {\n                nums1[k--] = nums1[i--];\n            } else {\n                nums1[k--] = nums2[j--];\n            }\n        }\n    }\n}",
+    "cppCode": "class Solution {\npublic:\n    void merge(vector<int>& nums1, int m, vector<int>& nums2, int n) {\n        int i = m - 1, j = n - 1, k = m + n - 1;\n\n        while (j >= 0) {\n            if (i >= 0 && nums1[i] > nums2[j]) {\n                nums1[k--] = nums1[i--];\n            } else {\n                nums1[k--] = nums2[j--];\n            }\n        }\n    }\n};",
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/3_Day/NOTES/Final_88.Merge%20Sorted%20Array.svg"
+  },
+  {
+    "pattern": "Two Pointers",
+    "question": "Count Pairs Whose Sum is Less than Target",
+    "videoId": "SP065oLnxGA",
+    "startTime": 1138,
+    "endTime": 2068,
+    "intuition": "Array sort karo. Do pointers lo: left start pe, right end pe. Agar nums[left] + nums[right] < target hai, to left ke saath jitne elements left+1..right tak hain sab valid pairs hain (count += right-left), phir left++. Agar sum bada ya equal ho to right--. O(n log n) sort + O(n) scan.",
+    "javaCode": "class Solution {\n    public int countPairs(List<Integer> nums, int target) {\n        Collections.sort(nums);\n        int left = 0, right = nums.size() - 1;\n        int count = 0;\n\n        while (left < right) {\n            int sum = nums.get(left) + nums.get(right);\n            if (sum < target) {\n                count += right - left;\n                left++;\n            } else {\n                right--;\n            }\n        }\n\n        return count;\n    }\n}",
+    "cppCode": "class Solution {\npublic:\n    int countPairs(vector<int>& nums, int target) {\n        sort(nums.begin(), nums.end());\n        int left = 0, right = nums.size() - 1;\n        int count = 0;\n\n        while (left < right) {\n            int sum = nums[left] + nums[right];\n            if (sum < target) {\n                count += right - left;\n                left++;\n            } else {\n                right--;\n            }\n        }\n\n        return count;\n    }\n};",
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/3_Day/NOTES/FINAL_2824.%20Count%20Pairs%20Whose%20Sum%20is%20Less%20than%20Target.svg"
+  },
+  {
+    "pattern": "Two Pointers",
+    "question": "Two Sum",
+    "videoId": "SP065oLnxGA",
+    "startTime": 2068,
+    "endTime": 2780,
+    "intuition": "Unsorted array hai, isliye hashmap best hai. Ek pass me chalo: current number ke liye complement = target - num. Agar map me complement mila to answer mil gaya. Nahi to current index store karo. O(n) time, O(n) space.",
+    "javaCode": "class Solution {\n    public int[] twoSum(int[] nums, int target) {\n        Map<Integer, Integer> map = new HashMap<>(); // value -> index\n\n        for (int i = 0; i < nums.length; i++) {\n            int complement = target - nums[i];\n            if (map.containsKey(complement)) {\n                return new int[]{map.get(complement), i};\n            }\n            map.put(nums[i], i);\n        }\n        return new int[0];\n    }\n}",
+    "cppCode": "class Solution {\npublic:\n    vector<int> twoSum(vector<int>& nums, int target) {\n        unordered_map<int, int> mp; // value -> index\n\n        for (int i = 0; i < nums.size(); i++) {\n            int complement = target - nums[i];\n            if (mp.count(complement)) {\n                return {mp[complement], i};\n            }\n            mp[nums[i]] = i;\n        }\n        return {};\n    }\n};",
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/3_Day/NOTES/FINAL_1.%20Two%20Sum.svg"
+  },
+  {
+    "pattern": "Two Pointers",
+    "question": "Two Sum II - Input Array Is Sorted",
+    "videoId": "SP065oLnxGA",
+    "startTime": 2780,
+    "endTime": 3363,
+    "intuition": "Array sorted hai, to do pointers simple solution hai. Start left=0, right=n-1. Sum compare karo target se. Sum chhota hai to left++, sum bada hai to right--, match mila to indices (1-based) return karo.",
+    "javaCode": "class Solution {\n    public int[] twoSum(int[] numbers, int target) {\n        int left = 0, right = numbers.length - 1;\n\n        while (left < right) {\n            int sum = numbers[left] + numbers[right];\n            if (sum == target) {\n                return new int[]{left + 1, right + 1};\n            } else if (sum < target) {\n                left++;\n            } else {\n                right--;\n            }\n        }\n        return new int[0];\n    }\n}",
+    "cppCode": "class Solution {\npublic:\n    vector<int> twoSum(vector<int>& numbers, int target) {\n        int left = 0, right = numbers.size() - 1;\n\n        while (left < right) {\n            int sum = numbers[left] + numbers[right];\n            if (sum == target) {\n                return {left + 1, right + 1};\n            } else if (sum < target) {\n                left++;\n            } else {\n                right--;\n            }\n        }\n        return {};\n    }\n};",
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/3_Day/NOTES/FINAL_167.%20Two%20Sum%20II%20-%20Input%20Array%20Is%20Sorted.svg"
+  },
+  {
+    "pattern": "Two Pointers",
+    "question": "3Sum",
+    "videoId": "SP065oLnxGA",
+    "startTime": 3363,
+    "endTime": 5280,
+    "intuition": "Sort karo, fir har index ko fix karke baaki do numbers two-pointer se dhundo. Duplicates skip karo (fixed index aur left/right move dono par). Target 0 hai to sum = nums[i] + nums[l] + nums[r]. Sum chhota to l++, sum bada to r--, match mila to add list aur duplicates skip karo.",
+    "javaCode": "class Solution {\n    public List<List<Integer>> threeSum(int[] nums) {\n        Arrays.sort(nums);\n        List<List<Integer>> res = new ArrayList<>();\n\n        for (int i = 0; i < nums.length; i++) {\n            if (i > 0 && nums[i] == nums[i - 1]) continue;\n\n            int left = i + 1, right = nums.length - 1;\n            while (left < right) {\n                int sum = nums[i] + nums[left] + nums[right];\n                if (sum == 0) {\n                    res.add(Arrays.asList(nums[i], nums[left], nums[right]));\n                    left++; right--;\n                    while (left < right && nums[left] == nums[left - 1]) left++;\n                    while (left < right && nums[right] == nums[right + 1]) right--;\n                } else if (sum < 0) {\n                    left++;\n                } else {\n                    right--;\n                }\n            }\n        }\n\n        return res;\n    }\n}",
+    "cppCode": "class Solution {\npublic:\n    vector<vector<int>> threeSum(vector<int>& nums) {\n        sort(nums.begin(), nums.end());\n        vector<vector<int>> res;\n\n        for (int i = 0; i < nums.size(); i++) {\n            if (i > 0 && nums[i] == nums[i - 1]) continue;\n\n            int left = i + 1, right = nums.size() - 1;\n            while (left < right) {\n                int sum = nums[i] + nums[left] + nums[right];\n                if (sum == 0) {\n                    res.push_back({nums[i], nums[left], nums[right]});\n                    left++; right--;\n                    while (left < right && nums[left] == nums[left - 1]) left++;\n                    while (left < right && nums[right] == nums[right + 1]) right--;\n                } else if (sum < 0) {\n                    left++;\n                } else {\n                    right--;\n                }\n            }\n        }\n\n        return res;\n    }\n};",
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/3_Day/NOTES/FINAL_15.%203Sum.svg"
+  },
+  {
+    "pattern": "Two Pointers",
+    "question": "Sort Two Colors",
+    "videoId": "pcj6S1KLxWc",
+    "startTime": 97,
+    "endTime": 890,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/4_Day/NOTES/Final_Sort%20Two%20Colors.svg"
+  },
+  {
+    "pattern": "Two Pointers",
+    "question": "Sort Colors",
+    "videoId": "pcj6S1KLxWc",
+    "startTime": 890,
+    "endTime": 1920,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/4_Day/NOTES/FINAL_75.%20Sort%20Colors.svg"
+  },
+  {
+    "pattern": "Two Pointers",
+    "question": "Remove Nth Node From End of List",
+    "videoId": "pcj6S1KLxWc",
+    "startTime": 1920,
+    "endTime": 3240,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/4_Day/NOTES/FINALE__19.%20Remove%20Nth%20Node%20From%20End%20of%20List.excalidraw.svg"
+  },
+  {
+    "pattern": "Two Pointers",
+    "question": "Strobogrammatic Number",
+    "videoId": "jA74srakqvI",
+    "startTime": 333,
+    "endTime": 1262,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/5_Day/NOTES/FINAL_246.%20Strobogrammatic%20Number.svg"
+  },
+  {
+    "pattern": "Two Pointers",
+    "question": "Append Characters to String to Make Subsequence",
+    "videoId": "jA74srakqvI",
+    "startTime": 1262,
+    "endTime": 2010,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/5_Day/NOTES/FINAL_2486.%20Append%20Characters%20to%20String%20to%20Make%20Subsequence.svg"
+  },
+  {
+    "pattern": "Two Pointers",
+    "question": "Lowest Common Ancestor of a Binary Tree III",
+    "videoId": "jA74srakqvI",
+    "startTime": 2010,
+    "endTime": 3560,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/5_Day/NOTES/FINAL_1650.%20Lowest%20Common%20Ancestor%20of%20a%20Binary%20Tree%20III.svg"
+  },
+  {
+    "pattern": "Two Pointers",
+    "question": "Reverse Words in a String",
+    "videoId": "IW8gQ2u2O_I",
+    "startTime": 69,
+    "endTime": 2776,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/6_Day/NOTES/FINAL_151.%20Reverse%20Words%20in%20a%20String.svg"
+  },
+  {
+    "pattern": "Fast and Slow Pointers",
+    "question": "Linked List Cycle",
+    "videoId": "FguUjuCzhj0",
+    "startTime": 496,
+    "endTime": 1335,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/8_Day/NOTES/FINAL_141.%20Linked%20List%20Cycle.svg"
+  },
+  {
+    "pattern": "Fast and Slow Pointers",
+    "question": "Fast and Slow Pointer Template",
+    "videoId": "FguUjuCzhj0",
+    "startTime": 1877,
+    "endTime": 1991
+  },
+  {
+    "pattern": "Fast and Slow Pointers",
+    "question": "Happy Number",
+    "videoId": "eIItwq8UTmU",
+    "startTime": 164,
+    "endTime": 1917,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/8_Day/NOTES/FINAL_202.%20Happy%20Number.svg"
+  },
+  {
+    "pattern": "Fast and Slow Pointers",
+    "question": "Middle of the Linked List",
+    "videoId": "eIItwq8UTmU",
+    "startTime": 1917,
+    "endTime": 2265,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/8_Day/NOTES/FINAL_876.%20Middle%20of%20the%20Linked%20List.svg"
+  },
+  {
+    "pattern": "Fast and Slow Pointers",
+    "question": "Linked List Cycle",
+    "videoId": "eIItwq8UTmU",
+    "startTime": 2265,
+    "endTime": 3039,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/8_Day/NOTES/FINAL_141.%20Linked%20List%20Cycle.svg"
+  },
+  {
+    "pattern": "Fast and Slow Pointers",
+    "question": "Linked List Cycle II",
+    "videoId": "eIItwq8UTmU",
+    "startTime": 3039,
+    "endTime": 4044,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/8_Day/NOTES/FINAL_142.%20Linked%20List%20Cycle%20II.svg"
+  },
+  {
+    "pattern": "Fast and Slow Pointers",
+    "question": "Find Length of Loop",
+    "videoId": "eIItwq8UTmU",
+    "startTime": 4044,
+    "endTime": 4394
+  },
+  {
+    "pattern": "Fast and Slow Pointers",
+    "question": "Split a Linked List into Two Halves",
+    "videoId": "E85jp_rHivc",
+    "startTime": 61,
+    "endTime": 1149,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/9_Day/NOTES/FINAL_Split%20a%20Linked%20List%20into%20two%20halves.svg"
+  },
+  {
+    "pattern": "Fast and Slow Pointers",
+    "question": "Find the Duplicate Number",
+    "videoId": "E85jp_rHivc",
+    "startTime": 1149,
+    "endTime": 2477,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/9_Day/NOTES/FINAL_287.%20Find%20the%20Duplicate%20Number.svg"
+  },
+  {
+    "pattern": "Fast and Slow Pointers",
+    "question": "Palindrome Linked List",
+    "videoId": "E85jp_rHivc",
+    "startTime": 2477,
+    "endTime": 3490,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/9_Day/NOTES/FINAL_234.%20Palindrome%20Linked%20List.svg"
+  },
+  {
+    "pattern": "Fast and Slow Pointers",
+    "question": "Maximum Twin Sum of a Linked List",
+    "videoId": "t40HN4Rla30",
+    "startTime": 197,
+    "endTime": 1340,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/10_Day/NOTES/FINAL_2130.%20Maximum%20Twin%20Sum%20of%20a%20Linked%20List.svg"
+  },
+  {
+    "pattern": "Fast and Slow Pointers",
+    "question": "Circular Array Loop",
+    "videoId": "nFZ1mysCZc0",
+    "startTime": 290,
+    "endTime": 3375,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/11_Day/NOTES/FINAL_457.%20Circular%20Array%20Loop.excalidraw.svg"
+  },
+  {
+    "pattern": "Sliding Window",
+    "question": "Fixed Window Template",
+    "videoId": "wAQI89N44u4",
+    "startTime": 3877,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/12_Day/NOTES/FINAL_3_Sliding_Window_Theory.excalidraw.svg",
+    "endTime": 4050
+  },
+  {
+    "pattern": "Sliding Window",
+    "question": "Dynamic Window Template",
+    "videoId": "wAQI89N44u4",
+    "startTime": 4050,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/17_Day/NOTES/Revision_Dynamic_Sliding_Window.svg",
+    "endTime": 4175
+  },
+  {
+    "pattern": "Sliding Window",
+    "question": "Max Sum Subarray of size K",
+    "videoId": "D4kHj9FMcK8",
+    "startTime": 170,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/13_Day/NOTES/FINAL_Max%20Sum%20Subarray%20of%20size%20K.excalidraw.svg",
+    "endTime": 867
+  },
+  {
+    "pattern": "Sliding Window",
+    "question": "Maximum Sum of Distinct Subarrays with Length K",
+    "videoId": "D4kHj9FMcK8",
+    "startTime": 867,
+    "endTime": 3724,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/13_Day/NOTES/FINAL_2461.%20Maximum%20Sum%20of%20Distinct%20Subarrays%20With%20Length%20K.excalidraw.svg"
+  },
+  {
+    "pattern": "Sliding Window",
+    "question": "Minimum Size Subarray Sum",
+    "videoId": "D4kHj9FMcK8",
+    "startTime": 3724,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/13_Day/NOTES/FINAL_209.%20Minimum%20Size%20Subarray%20Sum.excalidraw.svg",
+    "endTime": 5490
+  },
+  {
+    "pattern": "Sliding Window",
+    "question": "Contains Duplicate II",
+    "videoId": "CYY-Zy7HTLg",
+    "startTime": 100,
+    "endTime": 1496,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/14_Day/NOTES/FINAL_219.%20Contains%20Duplicate%20II.excalidraw.svg"
+  },
+  {
+    "pattern": "Sliding Window",
+    "question": "Maximum Average Subarray I",
+    "videoId": "CYY-Zy7HTLg",
+    "startTime": 1496,
+    "endTime": 2300,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/14_Day/NOTES/FINAL_643.%20Maximum%20Average%20Subarray%20I.excalidraw.svg"
+  },
+  {
+    "pattern": "Sliding Window",
+    "question": "Longest Substring Without Repeating Characters",
+    "videoId": "CYY-Zy7HTLg",
+    "startTime": 2300,
+    "endTime": 4264,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/14_Day/NOTES/FINAL_3.%20Longest%20Substring%20Without%20Repeating%20Characters.excalidraw.svg"
+  },
+  {
+    "pattern": "Sliding Window",
+    "question": "Repeated DNA Sequences",
+    "videoId": "Mtwto_-RK10",
+    "startTime": 68,
+    "endTime": 3474,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/15_Day/NOTES/FINAL_187.%20Repeated%20DNA%20Sequences.excalidraw.svg"
+  },
+  {
+    "pattern": "Sliding Window",
+    "question": "Rabin Karp Algorithm",
+    "videoId": "Mtwto_-RK10",
+    "startTime": 1385,
+    "endTime": 2079
+  },
+  {
+    "pattern": "Sliding Window",
+    "question": "Longest Substring Without Repeating Characters - Map Approach",
+    "videoId": "iV7fGqFnaYI",
+    "startTime": 219,
+    "endTime": 867,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/16_Day/NOTES/FINAL_3.%20Longest%20Substring%20Without%20Repeating%20Characters.excalidraw.svg"
+  },
+  {
+    "pattern": "Sliding Window",
+    "question": "Fruit Into Baskets",
+    "videoId": "iV7fGqFnaYI",
+    "startTime": 867,
+    "endTime": 3020,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/16_Day/NOTES/FINAL_904.%20Fruit%20Into%20Baskets.excalidraw.svg"
+  },
+  {
+    "pattern": "Sliding Window",
+    "question": "Number of Sub-arrays of Size K and Average Greater than or Equal to Threshold",
+    "videoId": "yhmTk_HAiwA",
+    "startTime": 99,
+    "endTime": 1179,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/17_Day/NOTES/FINAL_1343.%20Number%20of%20Sub-arrays%20of%20Size%20K%20and%20Average%20Greater%20than%20or%20Equal%20to%20Threshold.excalidraw.svg"
+  },
+  {
+    "pattern": "Sliding Window",
+    "question": "Frequency of the Most Frequent Element",
+    "videoId": "yhmTk_HAiwA",
+    "startTime": 1179,
+    "endTime": 4164,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/17_Day/NOTES/FINAL_1838.%20Frequency%20of%20the%20Most%20Frequent%20Element.excalidraw.svg"
+  },
+  {
+    "pattern": "Sliding Window",
+    "question": "Longest Repeating Character Replacement",
+    "videoId": "Z4SoQHqMb7k",
+    "startTime": 99,
+    "endTime": 3113,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/18_Day/NOTES/FINAL_424.%20Longest%20Repeating%20Character%20Replacement.excalidraw.svg"
+  },
+  {
+    "pattern": "Intervals",
+    "question": "Interval Overlap Conditions",
+    "videoId": "rpzaI1EPYSI",
+    "startTime": 563,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/19_Day/NOTES/FINAL_4_Intervals_Theory.excalidraw.svg",
+    "endTime": 1160
+  },
+  {
+    "pattern": "Intervals",
+    "question": "Types of Interval Relationships",
+    "videoId": "rpzaI1EPYSI",
+    "startTime": 1160,
+    "endTime": 1552
+  },
+  {
+    "pattern": "Intervals",
+    "question": "Merge Overlapping Intervals",
+    "videoId": "rpzaI1EPYSI",
+    "startTime": 1825,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/21_Day/NOTES/FINAL_56.%20Merge%20Intervals.excalidraw.svg",
+    "endTime": 2400
+  },
+  {
+    "pattern": "Intervals",
+    "question": "Meeting Rooms",
+    "videoId": "rpzaI1EPYSI",
+    "startTime": 2400,
+    "endTime": 2654,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/27_Day/NOTES/FINAL_Meeting%20Rooms.excalidraw.svg"
+  },
+  {
+    "pattern": "Intervals",
+    "question": "Find Free Time Gaps",
+    "videoId": "rpzaI1EPYSI",
+    "startTime": 2654,
+    "endTime": 2812
+  },
+  {
+    "pattern": "Intervals",
+    "question": "Merge Overlapping Intervals - Code",
+    "videoId": "V1CWx1lUhUw",
+    "startTime": 108,
+    "endTime": 2090
+  },
+  {
+    "pattern": "Intervals",
+    "question": "Merge Intervals",
+    "videoId": "qY0qii68LAU",
+    "startTime": 108,
+    "endTime": 2090,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/21_Day/NOTES/FINAL_56.%20Merge%20Intervals.excalidraw.svg"
+  },
+  {
+    "pattern": "Intervals",
+    "question": "Interval List Intersections",
+    "videoId": "f70RgdbUdaE",
+    "startTime": 75,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/22_Day/NOTES/FINAL_986.%20Interval%20List%20Intersections.excalidraw.svg",
+    "endTime": 1962
+  },
+  {
+    "pattern": "Intervals",
+    "question": "Count Days Without Meetings",
+    "videoId": "f70RgdbUdaE",
+    "startTime": 1962,
+    "endTime": 3305,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/22_Day/NOTES/FINAL_3169.%20Count%20Days%20Without%20Meetings.excalidraw.svg",
+    "lectureNotesSvgOptions": [
+      {
+        "label": "Day 22 Notes",
+        "url": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/22_Day/NOTES/FINAL_3169.%20Count%20Days%20Without%20Meetings.excalidraw.svg"
+      },
+      {
+        "label": "Day 23 Notes",
+        "url": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/23_Day/NOTES/FINAL_3169.%20Count%20Days%20Without%20Meetings.excalidraw.svg"
+      }
+    ]
+  },
+  {
+    "pattern": "Intervals",
+    "question": "Count Days Without Meetings - Approach 2",
+    "videoId": "UfnfgOdMvac",
+    "startTime": 60,
+    "endTime": 1760
+  },
+  {
+    "pattern": "Intervals",
+    "question": "Insert Interval",
+    "videoId": "UfnfgOdMvac",
+    "startTime": 1760,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/23_Day/NOTES/FINAL_57.%20Insert%20Interval.excalidraw.svg",
+    "endTime": 3795
+  },
+  {
+    "pattern": "Intervals",
+    "question": "Remove Covered Intervals",
+    "videoId": "Q8b773muUQY",
+    "startTime": 35,
+    "endTime": 2590,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/24_Day/NOTES/FINAL_1288.%20Remove%20Covered%20Intervals.excalidraw.svg"
+  },
+  {
+    "pattern": "Intervals",
+    "question": "My Calendar II",
+    "videoId": "EPBYfs8J5tI",
+    "startTime": 198,
+    "endTime": 2580,
+    "lectureNotesSvgOptions": [
+      {
+        "label": "Day 25 Notes",
+        "url": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/25_Day/NOTES/FINAL_731.%20My%20Calendar%20II.excalidraw.svg"
+      },
+      {
+        "label": "Day 26 Notes",
+        "url": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/26_Day/NOTES/FINAL_731.%20My%20Calendar%20II.excalidraw.svg"
+      }
+    ],
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/25_Day/NOTES/FINAL_731.%20My%20Calendar%20II.excalidraw.svg"
+  },
+  {
+    "pattern": "Intervals",
+    "question": "Line Sweep Algorithm",
+    "videoId": "EPBYfs8J5tI",
+    "startTime": 2580,
+    "endTime": 3300
+  },
+  {
+    "pattern": "Intervals",
+    "question": "TreeMap Theory",
+    "videoId": "EPBYfs8J5tI",
+    "startTime": 3300,
+    "endTime": 4232
+  },
+  {
+    "pattern": "Intervals",
+    "question": "TreeMap Lab",
+    "videoId": "EPBYfs8J5tI",
+    "startTime": 4232,
+    "endTime": 5220
+  },
+  {
+    "pattern": "Intervals",
+    "question": "My Calendar II - Optimised",
+    "videoId": "xh57S8W6-tc",
+    "startTime": 397,
+    "endTime": 2210
+  },
+  {
+    "pattern": "Intervals",
+    "question": "Meeting Rooms",
+    "videoId": "gODaq3rrQ0E",
+    "startTime": 67,
+    "endTime": 1386,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/27_Day/NOTES/FINAL_Meeting%20Rooms.excalidraw.svg"
+  },
+  {
+    "pattern": "Intervals",
+    "question": "My Calendar I",
+    "videoId": "gODaq3rrQ0E",
+    "startTime": 1386,
+    "endTime": 3170,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/27_Day/NOTES/FINAL_729.%20My%20Calendar%20I.excalidraw.svg"
+  },
+  {
+    "pattern": "Intervals",
+    "question": "Car Pooling",
+    "videoId": "1ic73n25nMg",
+    "startTime": 90,
+    "endTime": 3015
+  },
+  {
+    "pattern": "Intervals",
+    "question": "Bucket Sort Algorithm",
+    "videoId": "1ic73n25nMg",
+    "startTime": 1330,
+    "endTime": 2495
+  },
+  {
+    "pattern": "Intervals",
+    "question": "My Calendar III",
+    "videoId": "CvPHNlhm7tU",
+    "startTime": 67,
+    "endTime": 1486,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/29_Day/NOTES/FINAL_732.%20My%20Calendar%20III.excalidraw.svg"
+  },
+  {
+    "pattern": "Intervals",
+    "question": "Meeting Rooms II",
+    "videoId": "CvPHNlhm7tU",
+    "startTime": 1486,
+    "endTime": 2300,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/29_Day/NOTES/FINAL_Meeting%20Rooms%20II.excalidraw.svg"
+  },
+  {
+    "pattern": "Intervals",
+    "question": "Data Stream as Disjoint Intervals",
+    "videoId": "e_0wYr-ZlJ4",
+    "startTime": 74,
+    "endTime": 2920
+  },
+  {
+    "pattern": "Fast and Slow Pointers",
+    "question": "Fast and Slow Pointer Theory",
+    "videoId": "FguUjuCzhj0",
+    "startTime": 0,
+    "endTime": 496,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/7_Day/NOTES/FINAL_2_Fast_Slow_Pointer_Theory.excalidraw.svg",
+    "isTheory": true
+  },
+  {
+    "pattern": "Sliding Window",
+    "question": "Sliding Window Theory",
+    "videoId": "wAQI89N44u4",
+    "startTime": 0,
+    "endTime": 3877,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/12_Day/NOTES/FINAL_3_Sliding_Window_Theory.excalidraw.svg",
+    "isTheory": true
+  },
+  {
+    "pattern": "Intervals",
+    "question": "Intervals Theory Part 1",
+    "videoId": "rpzaI1EPYSI",
+    "startTime": 0,
+    "endTime": 2654,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/19_Day/NOTES/FINAL_4_Intervals_Theory.excalidraw.svg",
+    "isTheory": true
+  },
+  {
+    "pattern": "Intervals",
+    "question": "Intervals Theory Part 2",
+    "videoId": "V1CWx1lUhUw",
+    "startTime": 0,
+    "endTime": 2090,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/20_Day/NOTES/FINAL_4_Intervals_Theory_Part_2.excalidraw.svg",
+    "isTheory": true
+  },
+  {
+    "pattern": "Two Pointers",
+    "question": "Two Pointer Pattern Theory",
+    "videoId": "Elnhh8cC2vM",
+    "startTime": 0,
+    "endTime": 1960,
+    "lectureNotesSvg": "https://raw.githubusercontent.com/team-codebug/babua-dsa-patterns-course/main/1_Day/1_Two_Pointer_Pattern_Theory.excalidraw.svg",
+    "isTheory": true
+  }
+]

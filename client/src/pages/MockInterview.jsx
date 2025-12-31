@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import * as THREE from 'three';
 import {
     Home, Bell, Gift, Mic, Video, Clock, ArrowRight, Play, Users,
-    CheckCircle, Star, Target, Sparkles, MessageSquare, Brain, Zap, Lock
+    CheckCircle, Star, Target, Sparkles, MessageSquare, Brain, Zap, Lock, RotateCcw
 } from 'lucide-react';
 import InterviewSession from '../components/interview/InterviewSession';
 import InterviewResults from '../components/interview/InterviewResults';
@@ -129,6 +129,7 @@ function InterviewBackground() {
 const navItems = [
     { name: 'Dashboard', href: '/dashboard', icon: Home },
     { name: 'Mock Interview', href: '/mock-interview', icon: Mic, active: true },
+    { name: 'Revision', href: '/revision', icon: RotateCcw },
     { name: 'Rewards', href: '/how-to-earn', icon: Gift },
 ];
 
